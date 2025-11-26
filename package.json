@@ -18,12 +18,12 @@
         }
     },
     "dependencies": {
-        "fp-ts": "^2.13.1",
-        "kysely": "^0.26.1",
+        "fp-ts": "^2.16.11",
+        "kysely": "^0.28.8",
         "value-or-factory": "^0.0.1"
     },
     "devDependencies": {
-        "kysely": "^0.26.1"
+        "kysely": "^0.28.8"
     },
-    "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
+    "packageManager": "yarn@4.9.1"
 }

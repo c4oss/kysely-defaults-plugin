@@ -111,12 +111,14 @@ export class DefaultsTransformer extends OperationNodeTransformer {
         const overrides = this.updateValues(node, this.options.table.overrides)
         const updates = {
             ...defaults,
+            //@ts-ignore TODO
             ...Object.fromEntries((node.updates ?? []).map(_ => [_.column.column.name, _.value])),
             ...overrides,
         }
         return {
             ...node,
             updates: Object.entries(updates).map(update => {
+                //@ts-ignore TODO
                 return ColumnUpdateNode.create(ColumnNode.create(update[0]), update[1])
             })
         }
@@ -142,6 +144,7 @@ export class DefaultsTransformer extends OperationNodeTransformer {
         const updateOverrides = this.updateValues(node, this.options.table.overrides)
         const originalColumnNames = node.columns?.map(_ => _.column.name) ?? []
         const columnNames = [...Object.keys(insertDefaults), ...originalColumnNames, ...Object.keys(insertOverrides)].filter((value, index, array) => array.indexOf(value) === index)
+        //@ts-ignore TODO
         return {
             ...node,
             onConflict: (() => {
@@ -150,12 +153,14 @@ export class DefaultsTransformer extends OperationNodeTransformer {
                 }
                 const updates = {
                     ...updateDefaults,
+                    //@ts-ignore TODO
                     ...Object.fromEntries((node.onConflict.updates ?? []).map(_ => [_.column.column.name, _.value])),
                     ...updateOverrides,
                 }
                 return {
                     ...node.onConflict,
                     updates: Object.entries(updates).map(update => {
+                        //@ts-ignore TODO
                         return ColumnUpdateNode.create(ColumnNode.create(update[0]), update[1])
                     })
                 }

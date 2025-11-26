@@ -9,8 +9,11 @@ export class TableMatcher {
     constructor(private readonly matchers: TableTests) {
     }
 
-    table(node: OperationNode) {
-        if (TableNode.is(node)) {
+    table(node: OperationNode | undefined) {
+        if (node === undefined) {
+            return
+        }
+        else if (TableNode.is(node)) {
             return {
                 underlying: node,
                 alias: node
@@ -24,7 +27,10 @@ export class TableMatcher {
         }
     }
 
-    testNode(node: OperationNode) {
+    testNode(node: OperationNode | undefined) {
+        if (node === undefined) {
+            return
+        }
         const table = this.table(node)
         if (table === undefined) {
             return
@@ -33,7 +39,10 @@ export class TableMatcher {
             return table.alias
         }
     }
-    test(node: TableNode) {
+    test(node: TableNode | undefined) {
+        if (node === undefined) {
+            return false
+        }
         return [this.matchers].flat().map(_ => TableMatcher.match(_, node)).includes(true)
     }
 
