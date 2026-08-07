@@ -4,19 +4,12 @@
     "license": "MIT",
     "scripts": {
         "clean": "rm -rf dist",
-        "build": "rm -rf dist && npx concurrently \"npx tsc -p tsconfig.esm.json\" \"npx tsc -p tsconfig.cjs.json\"",
-        "watch": "npx concurrently \"npx tsc -p tsconfig.esm.json --watch\" \"npx tsc -p tsconfig.cjs.json --watch\""
+        "build": "tsc",
+        "watch": "tsc --watch"
     },
-    "main": "./dist/cjs/index.js",
-    "module": "./dist/esm/index.js",
-    "types": "./dist/types/index.d.ts",
-    "exports": {
-        ".": {
-            "require": "./dist/cjs/index.js",
-            "import": "./dist/esm/index.js",
-            "types": "./dist/types/index.d.ts"
-        }
-    },
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
     "dependencies": {
         "fp-ts": "^2.16.11",
         "kysely": "^0.28.8",

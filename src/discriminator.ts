@@ -1,4 +1,4 @@
-import { AndNode, BinaryOperationNode, ColumnNode, DeleteQueryNode, InsertQueryNode, JoinNode, KyselyPlugin, OnNode, OperationNode, OperationNodeTransformer, OperatorNode, PluginTransformQueryArgs, PluginTransformResultArgs, SelectQueryNode, UpdateQueryNode, ValueNode, WhereNode } from "kysely"
+import { AndNode, BinaryOperationNode, ColumnNode, DeleteQueryNode, InsertQueryNode, JoinNode, KyselyPlugin, OnNode, OperationNode, OperationNodeTransformer, OperatorNode, PluginTransformQueryArgs, PluginTransformResultArgs, QueryId, SelectQueryNode, UpdateQueryNode, ValueNode, WhereNode } from "kysely"
 import { ValueOrFactory, callOrGet } from "value-or-factory"
 import { TableMatcher, TableTests } from "./matcher"
 
@@ -55,8 +55,8 @@ export class DiscriminatorTransformer extends OperationNodeTransformer {
         })
     }
 
-    protected override transformJoin(originalNode: JoinNode) {
-        const node = super.transformJoin(originalNode)
+    protected override transformJoin(originalNode: JoinNode, queryId?: QueryId | undefined) {
+        const node = super.transformJoin(originalNode, queryId)
         const table = this.matcher.testNode(node.table)
         if (table === undefined) {
             return node
