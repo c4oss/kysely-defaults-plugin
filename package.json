@@ -1,15 +1,17 @@
 {
-    "name": "kysely-defaults-plugin",
+    "name": "@ispb/kysely-defaults-plugin",
     "version": "0.0.1",
     "license": "MIT",
+    "type": "module",
+    "sideEffects": false,
     "scripts": {
-        "clean": "rm -rf dist",
         "build": "tsc",
         "watch": "tsc --watch"
     },
-    "main": "./dist/index.js",
-    "module": "./dist/index.js",
-    "types": "./dist/index.d.ts",
+    "exports": {
+        "default": "./dist/index.js",
+        "types": "./dist/index.d.ts"
+    },
     "dependencies": {
         "fp-ts": "^2.16.11",
         "kysely": "^0.28.8",

@@ -1,6 +1,6 @@
-import { AndNode, BinaryOperationNode, ColumnNode, DeleteQueryNode, InsertQueryNode, JoinNode, KyselyPlugin, OnNode, OperationNode, OperationNodeTransformer, OperatorNode, PluginTransformQueryArgs, PluginTransformResultArgs, QueryId, SelectQueryNode, UpdateQueryNode, ValueNode, WhereNode } from "kysely"
+import { AndNode, BinaryOperationNode, ColumnNode, DeleteQueryNode, InsertQueryNode, JoinNode, KyselyPlugin, OnNode, OperationNode, OperationNodeTransformer, OperatorNode, PluginTransformQueryArgs, PluginTransformResultArgs, QueryId, ReferenceNode, SelectQueryNode, UpdateQueryNode, ValueNode, WhereNode } from "kysely"
 import { ValueOrFactory, callOrGet } from "value-or-factory"
-import { TableMatcher, TableTests } from "./matcher"
+import { TableMatcher, TableTests } from "./matcher.js"
 
 export type DiscriminatedNode = InsertQueryNode | SelectQueryNode | UpdateQueryNode | DeleteQueryNode | JoinNode
 export type Discriminator = { readonly table: TableTests, readonly columns: ValueOrFactory<Record<string, unknown>, [DiscriminatedNode]> }
@@ -49,7 +49,7 @@ export class DiscriminatorTransformer extends OperationNodeTransformer {
     private conditions(table: OperationNode, node: DiscriminatedNode) {
         return Object.entries(callOrGet(this.config.discriminator.columns, node)).map(([column, value]) => {
             // @ts-ignore TODO
-            return BinaryOperationNode.create(RefserenceNode.create(ColumnNode.create(column), table),
+            return BinaryOperationNode.create(ReferenceNode.create(ColumnNode.create(column), table),
                 OperatorNode.create("="),
                 ValueNode.create(value))
         })

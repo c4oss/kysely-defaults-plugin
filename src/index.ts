@@ -1,6 +1,6 @@
 
-export * from "./defaults"
-export * from "./discriminator"
-export * from "./matcher"
-export * from "./restriction"
+export * from "./defaults.js"
+export * from "./discriminator.js"
+export * from "./matcher.js"
+export * from "./restriction.js"
 

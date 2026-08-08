@@ -1,6 +1,6 @@
 import { ColumnNode, ColumnUpdateNode, InsertQueryNode, KyselyPlugin, OperationNode, OperationNodeTransformer, PluginTransformQueryArgs, PluginTransformResultArgs, UpdateQueryNode, ValueListNode, ValueNode, ValuesNode } from "kysely"
 import { ValueOrFactory, callOrGet } from "value-or-factory"
-import { TableMatcher, TableTests } from "./matcher"
+import { TableMatcher, TableTests } from "./matcher.js"
 
 export type DefaultColumns = Record<string, DefaultColumn>
 export type DefaultTable = { table: TableTests, defaults?: DefaultColumns, overrides?: DefaultColumns }
