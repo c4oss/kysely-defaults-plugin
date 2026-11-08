@@ -1,4 +1,4 @@
-import { AndNode, BinaryOperationNode, ColumnNode, DeleteQueryNode, InsertQueryNode, JoinNode, KyselyPlugin, OnNode, OperationNode, OperationNodeTransformer, OperatorNode, PluginTransformQueryArgs, PluginTransformResultArgs, QueryId, ReferenceNode, SelectQueryNode, UpdateQueryNode, ValueNode, WhereNode } from "kysely"
+import { AndNode, BinaryOperationNode, ColumnNode, DeleteQueryNode, InsertQueryNode, JoinNode, KyselyPlugin, OnNode, OperationNode, OperationNodeTransformer, OperatorNode, ParensNode, PluginTransformQueryArgs, PluginTransformResultArgs, QueryId, ReferenceNode, SelectQueryNode, UpdateQueryNode, ValueNode, WhereNode } from "kysely"
 import { ValueOrFactory, callOrGet } from "value-or-factory"
 import { TableMatcher, TableTests } from "./matcher.js"
 
@@ -10,6 +10,13 @@ export interface DiscriminatorTransformerConfig {
     readonly discriminator: Discriminator
     readonly throwOnUnsupported?: boolean | undefined
 
+}
+
+function group(node: OperationNode): OperationNode {
+    if (BinaryOperationNode.is(node) || ParensNode.is(node)) {
+        return node
+    }
+    return ParensNode.create(node)
 }
 
 function maybe<I, O>(value: I | undefined | null, func: (value: I) => O) {
@@ -38,7 +45,9 @@ export class DiscriminatorTransformer extends OperationNodeTransformer {
         if (filtered.length === 0) {
             return
         }
-        return filtered.reduce((prev, current) => AndNode.create(prev, current))
+        // Group every condition (unless it's already a single comparison or parenthesised).
+        // Otherwise an "or" inside an existing condition, such as a raw SQL fragment, would bind looser than our "and" and escape the discriminator.
+        return filtered.map(group).reduce((prev, current) => AndNode.create(prev, current))
     }
     /**
      * Apply the conditions of this discriminator to a table.
@@ -70,11 +79,17 @@ export class DiscriminatorTransformer extends OperationNodeTransformer {
 
     protected override transformDeleteQuery(originalNode: DeleteQueryNode) {
         const node = super.transformDeleteQuery(originalNode)
-        const table = this.matcher.testNode(node.from)
-        if (table === undefined) {
+        const filters = node.from.froms.flatMap(from => {
+            const table = this.matcher.testNode(from)
+            if (table === undefined) {
+                return []
+            }
+            return this.conditions(table, node)
+        })
+        if (filters.length === 0) {
             return node
         }
-        const conditions = this.combineConditions(node.where?.where, ...this.conditions(table, node))
+        const conditions = this.combineConditions(node.where?.where, ...filters)
         return {
             ...node,
             where: maybe(conditions, WhereNode.create)
@@ -131,25 +146,6 @@ export class DiscriminatorTransformer extends OperationNodeTransformer {
         const conditions = this.combineConditions(node.where?.where, ...filters)
         return {
             ...node,
-            joins: node.joins?.map(join => {
-                const table = this.matcher.testNode(join.table)
-                if (table === undefined) {
-                    return join
-                }
-                return {
-                    ...join,
-                    on: (() => {
-                        const conditions = this.combineConditions(...this.conditions(table, node))
-                        if (conditions === undefined) {
-                            return join.on
-                        }
-                        if (join.on === undefined) {
-                            return OnNode.create(conditions)
-                        }
-                        return OnNode.create(AndNode.create(join.on.on, conditions))
-                    })()
-                }
-            }),
             where: maybe(conditions, WhereNode.create)
         }
     }
